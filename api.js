@@ -1,32 +1,66 @@
 function createIssue (url, credentials, dataArray, issueIndex){
-
-
-    proj = dataArray["Project"][issueIndex];
-    description = dataArray["Description"][issueIndex];
-    summary = dataArray["Summary"][issueIndex];
-    type = dataArray["Type"][issueIndex];
-    priority = dataArray["Priority"][issueIndex];
-    
+    const sheet = SpreadsheetApp.getActiveSheet();
+    proj = dataArray["project"][issueIndex];
+    description = dataArray["description"][issueIndex];
+    summary = dataArray["summary"][issueIndex];
+    issueType = dataArray["type"][issueIndex];
+    if (issueType ==""){
+      issueType = sheet.getRange("defaultType").getValue();
+      sheet.getRange("hType").offset(issueIndex + 1,0).setValue(issueType);
+    }
+    priority = dataArray["priority"][issueIndex];
+    if (priority ==""){
+      priority = sheet.getRange("defaultPriority").getValue();
+      sheet.getRange("hPriority").offset(issueIndex + 1,0).setValue(priority);
+    }
+    var data = {}
   
-    var data = {
+    data = {
       "fields": {
-         "project":{ 
+        "project":{ 
             "key": proj
-         },
-         "priority": {
+        },
+        "priority": {
             "name": priority
-         },
+        },
         "summary": summary,
         "description": description,
         "issuetype":{
-            "name": type
-         }
+            "name": issueType
+        }
       }
     };
   
     var payload = JSON.stringify(data);
   
     return sendAPIData(url, credentials, "POST", payload);
+  }
+  
+  function updateIssue (url, credentials, dataArray, issueIndex){
+    const sheet = SpreadsheetApp.getActiveSheet();
+    url = url + dataArray["key"][issueIndex] + "?returnIssue=True";
+    description = dataArray["description"][issueIndex];
+    summary = dataArray["summary"][issueIndex];
+    priority = dataArray["priority"][issueIndex];
+    if (priority ==""){
+      priority = sheet.getRange("defaultPriority").getValue();
+      sheet.getRange("hPriority").offset(issueIndex + 1,0).setValue(priority);
+    }
+    var data = {}
+  
+    data = {
+      "fields": {
+        "priority": {
+            "name": priority
+        },
+        "summary": summary,
+        "description": description
+      }
+    };
+  
+    var payload = JSON.stringify(data);
+  
+    return sendAPIData(url, credentials, "PUT", payload);
   }
   
   function sendAPIData(url, credentials, method="GET", payload = ""){
@@ -52,9 +86,7 @@ function createIssue (url, credentials, dataArray, issueIndex){
       //
       var response = UrlFetchApp.fetch(url, options);
       Logger.log(response.getContentText());
-      //
-      // Parse the JSON response to use the Issue Key returned by the API in the email
-      //
+  
       var dataAll = JSON.parse(response.getContentText());
       
       Logger.log(dataAll);
@@ -99,5 +131,10 @@ function createIssue (url, credentials, dataArray, issueIndex){
     var test =  username.getResponseText() + ':' + apitoken.getResponseText();
     return Utilities.base64Encode(test) 
   }
+  
+  
+  
+  
+  //
   
    
