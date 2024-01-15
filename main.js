@@ -34,7 +34,9 @@ function main() {
         dataArray["key"][i] = response.key;
         sheet.getRange("hMessage").offset(i + 1, 0).setValue("Created!");
         sheet.getRange("hSkip").offset(i + 1, 0).setValue("TRUE");
+
         setCellURLKey(sheet.getRange("hKey").offset(i +1, 0), response.data.key, dataArray.urlHTTPIssue)
+
       }else{
         Logger.log(response["e"]);
         dataArray.message[i] = response.e;

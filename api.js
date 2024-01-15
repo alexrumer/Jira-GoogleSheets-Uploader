@@ -93,7 +93,7 @@ function updateIssue (credentials, dataArray, issueIndex){
  * @param {string} credentials Username + token encoded in base64.
  * @param {string} method The HTTP method to be used (PUT, GET, POST, etc).
  * @param {array} payload Payload to be sent to the API.
- * @return The status response in the form of a map [key, code, e]. Key=Jira Key, code=HTTP respose, e=error if any.
+ * @return The status response in the form of a map [data, code, e]. Key=Jira Key, code=HTTP respose, e=error if any.
  */
 function sendAPIData(url, credentials, method="GET", payload = ""){
   try {
@@ -163,8 +163,6 @@ function getLogin() {
     return false;
   }
 
- 
-  
   let credentials = username.getResponseText() + ':' + apitoken.getResponseText();
   return Utilities.base64Encode(credentials);
 }
@@ -189,3 +187,4 @@ function isValidLogin(url, credentials){
   }
 
 } 
+
