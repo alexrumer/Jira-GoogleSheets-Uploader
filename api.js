@@ -1,31 +1,31 @@
 /**
  * Defines all of the fields and creates payload to be sent to the API to create the issue
  *
- * @param {string} url URL of the API.
  * @param {string} credentials Username + token encoded in base64.
  * @param {array} dataArray Array which contains all the issue data.
  * @param {int} issueIndex Index of the issue to be created in the dataArray.
  * @return the status of the issue from sendAPIData.
  */
-function createIssue (url, credentials, dataArray, issueIndex){
+function createIssue (credentials, dataArray, issueIndex){
   const sheet = SpreadsheetApp.getActiveSheet();
-  proj = dataArray["project"][issueIndex];
+  let proj = dataArray.project[issueIndex];
+  let url = dataArray.urlIssue;
   var data = {}
 
   //initalize fields
-  description = dataArray["description"][issueIndex];
-  summary = dataArray["summary"][issueIndex];
+  let description = dataArray.description[issueIndex];
+  let summary = dataArray.summary[issueIndex];
   
-  issueType = dataArray["type"][issueIndex];
+  let issueType = dataArray.type[issueIndex];
   if (issueType ==""){
-    issueType = sheet.getRange("defaultType").getValue();
+    issueType = dataArray.defaultType;
     sheet.getRange("hType").offset(issueIndex + 1,0).setValue(issueType);
   }
   issueType = toTitle(issueType); //convert to Proper case due to API case sensitivty
  
-  priority = dataArray["priority"][issueIndex];
+  let priority = dataArray.priority[issueIndex];
   if (priority ==""){
-    priority = sheet.getRange("defaultPriority").getValue();
+    priority = dataArray.defaultPriority;
     sheet.getRange("hPriority").offset(issueIndex + 1,0).setValue(priority);
   }
   priority = toTitle(priority);
@@ -54,18 +54,17 @@ function createIssue (url, credentials, dataArray, issueIndex){
 /**
  * Defines all of the fields and creates payload to be sent to the API to update an issue.
  *
- * @param {string} url URL of the API.
  * @param {string} credentials Username + token encoded in base64.
  * @param {array} dataArray Array which contains all the issue data.
  * @param {int} issueIndex Index of the issue to be created in the dataArray.
  * @return the status of the issue from sendAPIData.
  */
-function updateIssue (url, credentials, dataArray, issueIndex){
+function updateIssue (credentials, dataArray, issueIndex){
   const sheet = SpreadsheetApp.getActiveSheet();
-  url = url + dataArray["key"][issueIndex] + "?returnIssue=True";
-  description = dataArray["description"][issueIndex];
-  summary = dataArray["summary"][issueIndex];
-  priority = dataArray["priority"][issueIndex];
+  let url = dataArray.urlIssue + dataArray["key"][issueIndex] + "?returnIssue=True";
+  let description = dataArray.description[issueIndex];
+  let summary = dataArray.summary[issueIndex];
+  let priority = dataArray.priority[issueIndex];
   if (priority ==""){
     priority = sheet.getRange("defaultPriority").getValue();
     sheet.getRange("hPriority").offset(issueIndex + 1,0).setValue(priority);

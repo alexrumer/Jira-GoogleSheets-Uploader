@@ -6,11 +6,6 @@ function main() {
   setStatus('Reading data...');
   var dataArray = readSheetData("rSheetData");
 
-  var urlSubDomain = sheet.getRange("jirasubdomain").getValue();
-  var urlHTTPIssue = "https://" + urlSubDomain + ".atlassian.net/browse/"
-  var urlIssue = "https://" + urlSubDomain + ".atlassian.net/rest/api/2/issue/";
-  var numDataRows = sheet.getRange("numRows").getValue();
-
   setStatus('Data read');
   creds = getLogin();
   if (creds == false){
@@ -21,30 +16,30 @@ function main() {
   clearData(false);
 
   var response = {};
-  for (var i = 0; i <= numDataRows; i++)
+  for (var i = 0; i <= dataArray.numDataRows; i++)
 
-    
-    if (dataArray["summary"][i] != "" && dataArray["skip"][i] == false ){
+    //create issue
+    if (dataArray.summary[i] != "" && dataArray.skip[i] == false ){
       response = {}
-      response = createIssue(urlIssue, creds, dataArray, i)
+      response = createIssue(creds, dataArray, i)
       if (response.code == 201){
-         setStatus("Created issue " + (i + 1) + " of " + numDataRows)
+         setStatus("Created issue " + (i + 1) + " of " + dataArray.numDataRows)
         Logger.log(response.key);
         dataArray["key"][i] = response.key;
         sheet.getRange("hMessage").offset(i + 1, 0).setValue("Created!");
         sheet.getRange("hSkip").offset(i + 1, 0).setValue("TRUE");
-        setCellURLKey(sheet.getRange("hKey").offset(i +1, 0), response.key, urlHTTPIssue)
+        setCellURLKey(sheet.getRange("hKey").offset(i +1, 0), response.key, dataArray.urlHTTPIssue)
       }else{
         Logger.log(response["e"]);
-        dataArray["message"][i] = response.e;
+        dataArray.message[i] = response.e;
         sheet.getRange("hMessage").offset(i + 1, 0).setValue(response.e)
       }
-     
-    }else if (dataArray["summary"][i] != "" && dataArray["skip"][i] == true && dataArray["key"][i] != "" ){
+     //update issue
+    }else if (dataArray.summary[i] != "" && dataArray.skip[i] == true && dataArray.key[i] != "" ){
       response = {}
-      response = updateIssue(urlIssue, creds, dataArray, i)
+      response = updateIssue(creds, dataArray, i)
       if (response.code == 200){
-         setStatus("Updated issue " + (i + 1) + " of " + numDataRows)
+         setStatus("Updated issue " + (i + 1) + " of " + dataArray.numDataRows)
          sheet.getRange("hMessage").offset(i +1, 0).setValue("Updated!");
       }else{
         Logger.log(response["e"]);
@@ -82,6 +77,15 @@ function readSheetData (NamedDataRange = "rSheetData"){
     body.map(row => dataMap[col].push(row[i]));
     i++;
   })
+  
+  //set defaults 
+  dataMap["defaultPriority"] = sheet.getRange("defaultPriority").getValue();
+  dataMap["defaultType"] = sheet.getRange("defaultType").getValue();
+  dataMap["urlSubDomain"] = sheet.getRange("jirasubdomain").getValue();
+  dataMap["urlHTTPIssue"] = dataMap.urlSubDomain + ".atlassian.net/browse/"
+  dataMap["urlIssue"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/2/issue/";
+  dataMap["numDataRows"] = sheet.getRange("numRows").getValue();
+
   return dataMap;
 }
 
