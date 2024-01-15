@@ -13,6 +13,12 @@ function main() {
     return false
   }
 
+  //check if login is correct
+  if (!isValidLogin(dataArray.urlProject,creds)){
+    setStatus("Credentials are invalid!",true);
+    return false;
+  }
+
   clearData(false);
 
   var response = {};
@@ -28,7 +34,9 @@ function main() {
         dataArray["key"][i] = response.key;
         sheet.getRange("hMessage").offset(i + 1, 0).setValue("Created!");
         sheet.getRange("hSkip").offset(i + 1, 0).setValue("TRUE");
-        setCellURLKey(sheet.getRange("hKey").offset(i +1, 0), response.key, dataArray.urlHTTPIssue)
+
+        setCellURLKey(sheet.getRange("hKey").offset(i +1, 0), response.data.key, dataArray.urlHTTPIssue)
+
       }else{
         Logger.log(response["e"]);
         dataArray.message[i] = response.e;
@@ -84,6 +92,7 @@ function readSheetData (NamedDataRange = "rSheetData"){
   dataMap["urlSubDomain"] = sheet.getRange("jirasubdomain").getValue();
   dataMap["urlHTTPIssue"] = dataMap.urlSubDomain + ".atlassian.net/browse/"
   dataMap["urlIssue"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/2/issue/";
+  dataMap["urlProject"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/2/project/search";
   dataMap["numDataRows"] = sheet.getRange("numRows").getValue();
 
   return dataMap;
@@ -105,7 +114,7 @@ function setStatus(message="", isError=false){
     .setBackground('#f4cccc'); //red
   }else if(message ==""){
     status.clearFormat() //clear cell color as there is no message
-    .clearContent(); 
+    status.setValue(message);
   }else{ 
     status.setValue(message)
     .setBackground('#fff2cc');

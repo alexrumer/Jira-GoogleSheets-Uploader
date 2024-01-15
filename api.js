@@ -93,7 +93,7 @@ function updateIssue (credentials, dataArray, issueIndex){
  * @param {string} credentials Username + token encoded in base64.
  * @param {string} method The HTTP method to be used (PUT, GET, POST, etc).
  * @param {array} payload Payload to be sent to the API.
- * @return The status response in the form of a map [key, code, e]. Key=Jira Key, code=HTTP respose, e=error if any.
+ * @return The status response in the form of a map [data, code, e]. Key=Jira Key, code=HTTP respose, e=error if any.
  */
 function sendAPIData(url, credentials, method="GET", payload = ""){
   try {
@@ -120,11 +120,9 @@ function sendAPIData(url, credentials, method="GET", payload = ""){
     Logger.log(response.getContentText());
 
     var dataAll = JSON.parse(response.getContentText());
-    
-    Logger.log(dataAll);
 
     var responseMap = {};
-    responseMap["key"] = dataAll.key;
+    responseMap["data"] = dataAll;
     responseMap["code"] = response.getResponseCode();
     return responseMap
   }catch(e){
@@ -138,7 +136,7 @@ function sendAPIData(url, credentials, method="GET", payload = ""){
 
 /**
  * gets user Login info using two prompts
- *
+ * 
  * @customfunction
  * @return Returns the encoded base64 username + API token key. If error, this returns false. 
  */
@@ -150,7 +148,6 @@ function getLogin() {
   
   if (username.getResponseText().length > 0) {
     Logger.log("User provided username");
-    Logger.log(username.getResponseText());
   } else {
     Logger.log("ERROR: User aborted username"); 
     return false;
@@ -165,8 +162,29 @@ function getLogin() {
     Logger.log("ERROR: User didn't provide key"); 
     return false;
   }
-  var test =  username.getResponseText() + ':' + apitoken.getResponseText();
-  return Utilities.base64Encode(test) 
+
+  let credentials = username.getResponseText() + ':' + apitoken.getResponseText();
+  return Utilities.base64Encode(credentials);
 }
 
- 
+/**
+ * Checks if user credentials are valid
+ *  
+ * @param url Url of the API.
+ * @param credentials Credentials to validate.
+ * @customfunction
+ * @return Returns true if valid, false otherwise 
+ */
+function isValidLogin(url, credentials){
+  
+  let response = sendAPIData(url, credentials, "GET")
+
+  if (response.data.total > 0){
+    Logger.log("login is valid");
+    return true;
+  }else {
+    return false;
+  }
+
+} 
+
