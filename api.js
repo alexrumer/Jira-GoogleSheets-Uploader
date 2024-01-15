@@ -93,7 +93,7 @@ function updateIssue (credentials, dataArray, issueIndex){
  * @param {string} credentials Username + token encoded in base64.
  * @param {string} method The HTTP method to be used (PUT, GET, POST, etc).
  * @param {array} payload Payload to be sent to the API.
- * @return The status response in the form of a map [data, code, e]. Key=Jira Key, code=HTTP respose, e=error if any.
+ * @return The status response in the form of a map [key, code, e]. Key=Jira Key, code=HTTP respose, e=error if any.
  */
 function sendAPIData(url, credentials, method="GET", payload = ""){
   try {
@@ -117,7 +117,6 @@ function sendAPIData(url, credentials, method="GET", payload = ""){
     // Make the HTTP call to the JIRA API
     //
     var response = UrlFetchApp.fetch(url, options);
-    Logger.log(response.getContentText());
 
     var dataAll = JSON.parse(response.getContentText());
 
@@ -133,6 +132,40 @@ function sendAPIData(url, credentials, method="GET", payload = ""){
   }
 }
 
+/**
+ * Outputs an array of Jira projects
+ *
+ * @param {string} url URL of the API.
+ * @param {string} credentials Username + token encoded in base64.
+ * @return array of the projects.
+ */
+function getProjects(url, credentials){
+
+  //get number of projects
+    let maxpage = 50;
+    let start = 0;
+    let projects = [];
+    let i = 0;
+    let urlpage = "";
+    projects["key"] = [];
+    projects["name"] = [];
+
+    let response = sendAPIData(url, credentials, "GET");
+    total = response.data.total;
+    for (start=0; start <total; start = start + maxpage){
+      response = null;
+      urlpage = url + "?startAt=" + start + "&maxResults=" + maxpage;
+      response = sendAPIData(urlpage, credentials, "GET")
+      for(i=0; i < response.data.values.length; i++){
+        //projects["key"][start + i] = response.data.values[i].key;
+        //projects["name"][start + i] = response.data.values[i].name;
+        projects.key.push([response.data.values[i].key]);
+        projects.name.push([response.data.values[i].name]);
+      }
+    }
+    
+  return projects;
+}
 
 /**
  * gets user Login info using two prompts
@@ -187,4 +220,3 @@ function isValidLogin(url, credentials){
   }
 
 } 
-

@@ -7,7 +7,7 @@ function main() {
   var dataArray = readSheetData("rSheetData");
 
   setStatus('Data read');
-  creds = getLogin();
+  let creds = getLogin();
   if (creds == false){
     setStatus('Login cancelled',true);
     return false
@@ -34,9 +34,7 @@ function main() {
         dataArray["key"][i] = response.key;
         sheet.getRange("hMessage").offset(i + 1, 0).setValue("Created!");
         sheet.getRange("hSkip").offset(i + 1, 0).setValue("TRUE");
-
         setCellURLKey(sheet.getRange("hKey").offset(i +1, 0), response.data.key, dataArray.urlHTTPIssue)
-
       }else{
         Logger.log(response["e"]);
         dataArray.message[i] = response.e;
@@ -108,13 +106,13 @@ function readSheetData (NamedDataRange = "rSheetData"){
  */
 function setStatus(message="", isError=false){
   const sheet = SpreadsheetApp.getActiveSheet();
-  var status = sheet.getRange("status")
+  let status = sheet.getRange("status");
   if (isError == true){
     status.setValue(message)
     .setBackground('#f4cccc'); //red
   }else if(message ==""){
-    status.clearFormat() //clear cell color as there is no message
-    status.setValue(message);
+    status.setBackground(null) //clear cell color as there is no message
+    .setValue(message);
   }else{ 
     status.setValue(message)
     .setBackground('#fff2cc');
@@ -140,3 +138,33 @@ function clearData(userClear=false){
 function clearSheetButton(){
   clearData(true);
 }
+
+function getProjectsButton(){
+  const sheet = SpreadsheetApp.getActiveSheet();
+  
+  sheet.getRange("Projects").clearContent();
+  
+  setStatus('Reading data...');
+  
+  var dataArray = readSheetData("rSheetData");
+  setStatus('Data read');
+  
+  let creds = getLogin();
+  if (creds == false){
+    setStatus('Login cancelled',true);
+    return false
+  }
+
+  //check if login is correct
+  if (!isValidLogin(dataArray.urlProject,creds)){
+    setStatus("Credentials are invalid!",true);
+    return false;
+  }
+  setStatus("Downloading Projects...")
+  let projects = getProjects(dataArray.urlProject,creds);
+
+  //write projects to the sheet
+  sheet.getRange("hProjectKey").offset(1,0,projects.key.length,1).setValues(projects.key);
+  sheet.getRange("hProjectName").offset(1,0,projects.key.length,1).setValues(projects.name);
+   setStatus((projects.key.length +" Projects downloaded!"))
+}  
