@@ -175,15 +175,24 @@ function getProjects(url, credentials){
  */
 function getLogin() {
   var ui = SpreadsheetApp.getUi();
+  const sheet = SpreadsheetApp.getActiveSheet(); 
+  let prop =  PropertiesService.getUserProperties();
+  let username = "";
 
-  //get username
-  var username = ui.prompt("Please enter Jira Username",ui.ButtonSet.OK_CANCEL);
-  
-  if (username.getResponseText().length > 0) {
-    Logger.log("User provided username");
-  } else {
-    Logger.log("ERROR: User aborted username"); 
-    return false;
+  Logger.log(sheet.getRange("askforUser").getValue())
+  if(sheet.getRange("askforUser").getValue() || prop.getProperty("username") == null){
+   //user name is not yet saved or ask every time is selected
+    var uname = ui.prompt("Please enter Jira Username",ui.ButtonSet.OK_CANCEL);
+    if (uname.getResponseText().length > 0) {
+      Logger.log("User provided username");
+      username = uname.getResponseText();
+      prop.setProperty("username",username);
+    } else {
+      Logger.log("ERROR: User aborted username"); 
+      return false;
+    }  
+  }else{
+    username = prop.getProperty("username");
   }
 
   //get API key
@@ -196,7 +205,7 @@ function getLogin() {
     return false;
   }
 
-  let credentials = username.getResponseText() + ':' + apitoken.getResponseText();
+  let credentials = username + ':' + apitoken.getResponseText();
   return Utilities.base64Encode(credentials);
 }
 
