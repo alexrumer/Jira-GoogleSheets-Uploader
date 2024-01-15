@@ -171,7 +171,9 @@ function getLogin() {
 
 /**
  * Checks if user credentials are valid
- *
+ *  
+ * @param url Url of the API.
+ * @param credentials Credentials to validate.
  * @customfunction
  * @return Returns true if valid, false otherwise 
  */
@@ -186,7 +188,4 @@ function isValidLogin(url, credentials){
     return false;
   }
 
-}
-
-
- 
+} 
