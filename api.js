@@ -15,6 +15,9 @@ function createIssue (credentials, dataArray, issueIndex){
   //initalize fields
   let description = dataArray.description[issueIndex];
   let summary = dataArray.summary[issueIndex];
+  let cfParent = dataArray.cfParent;
+  let parentKey = dataArray.parent[issueIndex].toUpperCase();
+  
   
   let issueType = dataArray.type[issueIndex];
   if (issueType ==""){
@@ -46,7 +49,13 @@ function createIssue (credentials, dataArray, issueIndex){
       }
     }
   };
-
+  
+  //set parent key
+  if (parentKey != ""){
+    data.fields[cfParent]=parentKey;
+  }else{
+    data.fields[cfParent]=null;
+  }
   var payload = JSON.stringify(data);
 
   return sendAPIData(url, credentials, "POST", payload);
@@ -69,6 +78,9 @@ function updateIssue (credentials, dataArray, issueIndex){
     priority = sheet.getRange("defaultPriority").getValue();
     sheet.getRange("hPriority").offset(issueIndex + 1,0).setValue(priority);
   }
+  let cfParent = dataArray.cfParent;
+  let parentKey = dataArray.parent[issueIndex].toUpperCase();
+
   var data = {}
 
   data = {
@@ -80,6 +92,12 @@ function updateIssue (credentials, dataArray, issueIndex){
       "description": description
     }
   };
+  //set parent key
+  if (parentKey != ""){
+    data.fields[cfParent]=parentKey;
+  }else{
+    data.fields[cfParent]=null;
+  }
 
   var payload = JSON.stringify(data);
 

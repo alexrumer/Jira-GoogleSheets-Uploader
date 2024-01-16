@@ -85,13 +85,14 @@ function readSheetData (NamedDataRange = "rSheetData"){
   })
   
   //set defaults 
-  dataMap["defaultPriority"] = sheet.getRange("defaultPriority").getValue();
+  dataMap["defaultPriority"] = sheet.getRange("defaultPriority").getValue()
   dataMap["defaultType"] = sheet.getRange("defaultType").getValue();
   dataMap["urlSubDomain"] = sheet.getRange("jirasubdomain").getValue();
-  dataMap["urlHTTPIssue"] = dataMap.urlSubDomain + ".atlassian.net/browse/"
+  dataMap["urlHTTPIssue"] = dataMap.urlSubDomain + ".atlassian.net/browse/";
   dataMap["urlIssue"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/2/issue/";
   dataMap["urlProject"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/2/project/search";
   dataMap["numDataRows"] = sheet.getRange("numRows").getValue();
+  dataMap['cfParent'] = sheet.getRange("cfParent").getValue();
 
   return dataMap;
 }
