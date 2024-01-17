@@ -19,9 +19,10 @@ function main() {
     return false;
   }
 
+  //clear status data
   clearData(false);
 
-  var response = {};
+  var response = [];
   for (var i = 0; i <= dataArray.numDataRows; i++)
 
     //create issue
@@ -40,7 +41,7 @@ function main() {
         dataArray.message[i] = response.e;
         sheet.getRange("hMessage").offset(i + 1, 0).setValue(response.e)
       }
-     //update issue
+     //update issue if it exists
     }else if (dataArray.summary[i] != "" && dataArray.skip[i] == true && dataArray.key[i] != "" ){
       response = {}
       response = updateIssue(creds, dataArray, i)
@@ -91,6 +92,7 @@ function readSheetData (NamedDataRange = "rSheetData"){
   dataMap["urlHTTPIssue"] = dataMap.urlSubDomain + ".atlassian.net/browse/";
   dataMap["urlIssue"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/2/issue/";
   dataMap["urlProject"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/2/project/search";
+  dataMap["urlUsers"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/3/user/search?query=*&maxResults=2500";
   dataMap["numDataRows"] = sheet.getRange("numRows").getValue();
   dataMap['cfParent'] = sheet.getRange("cfParent").getValue();
 
@@ -140,10 +142,11 @@ function clearSheetButton(){
   clearData(true);
 }
 
-function getProjectsButton(){
+function getUserAndProjects(){
   const sheet = SpreadsheetApp.getActiveSheet();
   
   sheet.getRange("Projects").clearContent();
+  sheet.getRange("Users").clearContent();
   
   setStatus('Reading data...');
   
@@ -161,6 +164,11 @@ function getProjectsButton(){
     setStatus("Credentials are invalid!",true);
     return false;
   }
+  setStatus("Downloading Users...")
+  let users = getUsers(dataArray.urlUsers,creds)
+  sheet.getRange("hDisplayName").offset(1,0,users.name.length,1).setValues(users.name);
+  sheet.getRange("hUserID").offset(1,0,users.id.length,1).setValues(users.id);
+
   setStatus("Downloading Projects...")
   let projects = getProjects(dataArray.urlProject,creds);
 
