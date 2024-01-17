@@ -12,9 +12,10 @@ In order to use this tool, you will need to get an [API token from Attlassian](h
 ### Configuration
 Open the sheet above and navigate to the Config tab
  1. Save as a copy of the sheet for your use. 
- 2. Add your Jira domain prefix (https://PREFIX.attlassian.net/)
- 3. Set up your available and default issue type and priority levels  
- ![image](https://github.com/alexrumer/Jira-GoogleSheets-Uploader/assets/20408958/ea60ac5c-0928-4a24-ac00-530f3e3cdc95)
+ 2. Add your Jira domain instance (https://MYINSTANCE.attlassian.net/)
+ 3. Set up your available and default issue type and priority levels.  
+    ![image](https://github.com/alexrumer/Jira-GoogleSheets-Uploader/assets/20408958/c0bed28a-df15-48fe-9014-ed72c299c81e)
+
  6. Get the name of your Parent / Epic field (you may need to look at the existing issue fiields to see what the field is called https://PREFIX.atlassian.net/rest/api/2/issue/ABC-123)
  7. On the main sheet, press the *Sync Users and Projects* button to download all of the active users and their user IDs (needed to make assignments) and project keys availiable to you. 
 
