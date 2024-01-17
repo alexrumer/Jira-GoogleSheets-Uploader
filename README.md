@@ -3,7 +3,7 @@
 ## Introduction
 This is an early version of the Google Sheets Jira Uploader tool. It allows a user to create multiple issues in different Jira project in a single operation. 
 
-Access it here [Google Sheet](https://docs.google.com/spreadsheets/d/1RtZcW4pzUm8hLmnPJAOrrSI4H0GZXysDM8PDEKd4wME/edit#gid=1564783105).
+Access it here [Google Sheet](https://docs.google.com/spreadsheets/d/18Z0NzKmpsslgK8S6UUuGojubZBny0_C3KU7Lp9foPpM/edit#gid=1564783105).
 
 ## Instructions
 ### Get API Key
