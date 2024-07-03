@@ -15,7 +15,6 @@ function createIssue (credentials, dataArray, issueIndex){
   //initalize fields
   let description = dataArray.description[issueIndex];
   let summary = dataArray.summary[issueIndex];
-  let cfParent = dataArray.cfParent;
   
   let issueType = dataArray.type[issueIndex];
   if (issueType ==""){
@@ -32,8 +31,8 @@ function createIssue (credentials, dataArray, issueIndex){
   priority = toTitle(priority);
   let parentKey = dataArray.parent[issueIndex].toUpperCase();
   if (parentKey == ""){parentKey = null};
-  let assginee = dataArray.user[issueIndex];
-  if (assginee == ""){assginee = null};
+  let assignee = dataArray.user[issueIndex];
+  if (assignee == ""){assignee = null};
 
   //build data array
   data = {
@@ -46,15 +45,19 @@ function createIssue (credentials, dataArray, issueIndex){
       },
       "summary": summary,
       "assignee": {
-          "id": assginee},
+          "id": assignee},
       "description": description,
       "issuetype":{
           "name": issueType
+      },
+      "parent": {
+        "key": parentKey
       }
     }
   };
   
-  data.fields[cfParent]=parentKey;
+  //data.fields[cfParent]=parentKey;
+  //
 
   var payload = JSON.stringify(data);
 
@@ -78,7 +81,6 @@ function updateIssue (credentials, dataArray, issueIndex){
     priority = sheet.getRange("defaultPriority").getValue();
     sheet.getRange("hPriority").offset(issueIndex + 1,0).setValue(priority);
   }
-  let cfParent = dataArray.cfParent;
   let parentKey = dataArray.parent[issueIndex].toUpperCase();
   if (parentKey == ""){parentKey = null};
   let assginee = dataArray.user[issueIndex];
@@ -95,11 +97,13 @@ function updateIssue (credentials, dataArray, issueIndex){
       "assignee": {
         "id": assginee
       },
-      "description": description
+      "description": description,
+      "parent": {
+        "key": parentKey
+      }
     }
   };
-  //set parent key
-  data.fields[cfParent]=parentKey;
+
   
 
   var payload = JSON.stringify(data);
