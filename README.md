@@ -7,7 +7,7 @@ Access it here [Google Sheet](https://docs.google.com/spreadsheets/d/18Z0NzKmpss
 
 ## Instructions
 ### Get API Key
-In order to use this tool, you will need to get an [API token from Attlassian](https://id.atlassian.com/manage-profile/security/api-tokens) and follow along [their guide](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/). Save this key in the password manager of your choice and rotate it often. 
+In order to use this tool, you will need to get an [API token from Atlassian](https://id.atlassian.com/manage-profile/security/api-tokens) and follow along [their guide](https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/). Save this key in the password manager of your choice and rotate it often. 
 
 ### Configuration
 Open the sheet above and navigate to the Config tab
