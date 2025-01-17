@@ -30,4 +30,3 @@ function setCellURLKey(range, jiraKey, baseurl) {
               .toLowerCase();
       });
   }
-  

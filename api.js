@@ -7,7 +7,7 @@
  * @return the status of the issue from sendAPIData.
  */
 function createIssue (credentials, dataArray, issueIndex){
-  const sheet = SpreadsheetApp.getActiveSheet();
+  const sh = SpreadsheetApp.getActiveSheet();
   let proj = dataArray.project[issueIndex];
   let url = dataArray.urlIssue;
   var data = {}
@@ -15,18 +15,18 @@ function createIssue (credentials, dataArray, issueIndex){
   //initalize fields
   let description = dataArray.description[issueIndex];
   let summary = dataArray.summary[issueIndex];
-  
   let issueType = dataArray.type[issueIndex];
+ 
   if (issueType ==""){
-    issueType = dataArray.defaultType;
-    sheet.getRange("hType").offset(issueIndex + 1,0).setValue(issueType);
+    issueType = dataArray.defaultType; //set default issue type if one is not provided
+    sh.getRange("hType").offset(issueIndex + 1,0).setValue(issueType);
   }
   issueType = toTitle(issueType); //convert to Proper case due to API case sensitivty
  
   let priority = dataArray.priority[issueIndex];
   if (priority ==""){
-    priority = dataArray.defaultPriority;
-    sheet.getRange("hPriority").offset(issueIndex + 1,0).setValue(priority);
+    priority = dataArray.defaultPriority; //set default issue priority if one is not provided
+    sh.getRange("hPriority").offset(issueIndex + 1,0).setValue(priority);
   }
   priority = toTitle(priority);
   let parentKey = dataArray.parent[issueIndex].toUpperCase();
@@ -72,21 +72,21 @@ function createIssue (credentials, dataArray, issueIndex){
  * @return the status of the issue from sendAPIData.
  */
 function updateIssue (credentials, dataArray, issueIndex){
-  const sheet = SpreadsheetApp.getActiveSheet();
-  let url = dataArray.urlIssue + dataArray["key"][issueIndex] + "?returnIssue=True";
-  let description = dataArray.description[issueIndex];
-  let summary = dataArray.summary[issueIndex];
+  const sh = SpreadsheetApp.getActiveSheet();
+  const url = dataArray.urlIssue + dataArray["key"][issueIndex] + "?returnIssue=True";
+  const description = dataArray.description[issueIndex];
+  const summary = dataArray.summary[issueIndex];
   let priority = dataArray.priority[issueIndex];
   if (priority ==""){
-    priority = sheet.getRange("defaultPriority").getValue();
-    sheet.getRange("hPriority").offset(issueIndex + 1,0).setValue(priority);
+    priority = sh.getRange("defaultPriority").getValue();
+    sh.getRange("hPriority").offset(issueIndex + 1,0).setValue(priority);
   }
   let parentKey = dataArray.parent[issueIndex].toUpperCase();
   if (parentKey == ""){parentKey = null};
   let assginee = dataArray.user[issueIndex];
   if (assginee == ""){assginee = null};
   
-  var data = {}
+  var data = {};
 
   data = {
     "fields": {
@@ -102,9 +102,50 @@ function updateIssue (credentials, dataArray, issueIndex){
         "key": parentKey
       }
     }
-  };
+  }
+   
+  var payload = JSON.stringify(data);
 
+  return sendAPIData(url, credentials, "PUT", payload);
+}
+/**
+ * Defines all of the fields and creates payload to be sent to the API to add links to an issue
+ *
+ * @param {string} credentials Username + token encoded in base64.
+ * @param {array} dataArray Array which contains all the issue data.
+ * @param {int} issueIndex Index of the issue to be created in the dataArray.
+ * @return the status of the issue from sendAPIData.
+ */
+function addIssueLinks (credentials, dataArray, issueIndex){
+  const sheet = SpreadsheetApp.getActiveSheet();
+  const url = dataArray.urlIssue + dataArray.key[issueIndex] + "?returnIssue=True";
+
+  //issue links
+  let linkName = dataArray.issuelinkname[issueIndex];
+  let linkIn = dataArray.issuelinkin[issueIndex];
+  let linkOut = dataArray.issuelinkout[issueIndex];
+  let outwardIssue =dataArray.key[dataArray.issuelink[issueIndex] - 1];
   
+  var data = {};
+
+  data = {
+      "update":{
+        "issuelinks":[
+          {
+            "add":{
+              "type":{
+                "name": linkName,
+                  "inward":linkIn,
+                  "outward":linkOut,
+              },
+              "outwardIssue":{
+                "key":outwardIssue
+              }
+            }
+          }
+        ]
+      }
+    };
 
   var payload = JSON.stringify(data);
 
@@ -221,18 +262,17 @@ function getUsers(userURL, credentials){
  */
 function getLogin() {
   var ui = SpreadsheetApp.getUi();
-  const sheet = SpreadsheetApp.getActiveSheet(); 
+  const sh = SpreadsheetApp.getActiveSheet(); 
   let prop =  PropertiesService.getUserProperties();
   let username = "";
 
-  Logger.log(sheet.getRange("askforUser").getValue())
   //init property
   if (prop.getProperty("username") == null ){
     prop.setProperty("username","")
     }
 
-  if(sheet.getRange("askforUser").getValue() || prop.getProperty("username") == ""){
-   //user name is not yet saved or ask every time is selected
+  if(sh.getRange("askforUser").getValue() || prop.getProperty("username") == ""){
+   //user name is not yet saved or 'ask every time' is selected
     var uname = ui.prompt("Please enter Jira Username",ui.ButtonSet.OK_CANCEL);
     if (uname.getResponseText().length > 0) {
       Logger.log("User provided username");
