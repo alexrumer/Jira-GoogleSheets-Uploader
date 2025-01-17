@@ -1,9 +1,7 @@
-
-
 function main() {
-  const sheet = SpreadsheetApp.getActiveSheet();
+  const sh = SpreadsheetApp.getActiveSheet();
   
-  Logger.log("Version: " + sheet.getRange("version").getValue());
+  Logger.log("Version: " + sh.getRange("version").getValue());
   //read sheet data
   setStatus('Reading data...');
   var dataArray = readSheetData("rSheetData");
@@ -28,44 +26,63 @@ function main() {
   }
   //login is ok, proceed with clearing old data and creating issues
   const startTime = Date.now();
-  let createdIssues=0;
+  let createdIssues = 0;
+  let createdLinks = 0;
   //clear status data
   clearData(false);
 
   var response = [];
-  for (var i = 0; i <= dataArray.numDataRows; i++)
+  for (var i = 0; i <= dataArray.numDataRows; i++){
 
     //create issue
-    if (dataArray.summary[i] != "" && dataArray.skip[i] == false ){
+    if (dataArray.summary[i] != "" && !dataArray.skip[i] ){ //
       response = {}
       response = createIssue(creds, dataArray, i)
       if (response.code == 201){
-         setStatus("Created issue " + (createdIssues + 1) + " of " + dataArray.numIssues)
-        Logger.log(response.key);
-        dataArray["key"][i] = response.key;
-        sheet.getRange("hMessage").offset(i + 1, 0).setValue("201: Created!");
-        sheet.getRange("hSkip").offset(i + 1, 0).setValue("TRUE");
-        setCellURLKey(sheet.getRange("hKey").offset(i +1, 0), response.data.key, dataArray.urlHTTPIssue)
         createdIssues++;
+        setStatus("Created issue " + (createdIssues) + " of " + dataArray.numIssues + "...")
+        //Logger.log(response.data.key);
+        dataArray.key[i] = response.data.key;
+        sh.getRange("hMessage").offset(i + 1, 0).setValue("201: Created!");
+        sh.getRange("hSkip").offset(i + 1, 0).setValue("TRUE"); //update checkbox so that the issue does not get recreated
+        setCellURLKey(sh.getRange("hKey").offset(i +1, 0), response.data.key, dataArray.urlHTTPIssue)
+        
       }else{
         Logger.log(response["e"]);
         dataArray.message[i] = response.e;
-        sheet.getRange("hMessage").offset(i + 1, 0).setValue(response.e)
+        sh.getRange("hMessage").offset(i + 1, 0).setValue(response.e)
       }
      //update issue if it exists
-    }else if (dataArray.summary[i] != "" && dataArray.skip[i] == true && dataArray.key[i] != "" ){
+    }else if (dataArray.summary[i] != "" && dataArray.skip[i] && dataArray.key[i] != "" ){
       response = {}
       response = updateIssue(creds, dataArray, i)
       if (response.code == 200){
-         setStatus("Updated issue " + (createdIssues + 1) + " of " + dataArray.numIssues)
-         sheet.getRange("hMessage").offset(i +1, 0).setValue("200: Updated!");
          createdIssues++;
+         setStatus("Updated issue " + (createdIssues) + " of " + dataArray.numIssues + "...")
+         sh.getRange("hMessage").offset(i +1, 0).setValue("200: Updated!");
       }else{
         Logger.log(response["e"]);
-        dataArray["message"][i] = response["e"];
-        sheet.getRange("hMessage").offset(i + 1, 0).setValue(response.e)
+        dataArray.message[i] = response["e"];
+        sh.getRange("hMessage").offset(i + 1, 0).setValue(response.e)
+      }
+    }
+  };
+  //check if links need to be added for the issues already created. Links need to be added once the key is known.
+  for (var i = 0; i <= dataArray.numDataRows; i++){
+    if (dataArray.issuelink[i] !=""){
+      response = {}
+      response = addIssueLinks(creds, dataArray, i)
+      if (response.code == 200){
+         createdLinks++;
+         setStatus("Added issue link to" + (createdLinks) + " of " + dataArray.numLinks + "...")
+         sh.getRange("hMessage").offset(i +1, 0).setValue("200: Updated link!");
+      }else{
+        Logger.log(response["e"]);
+        dataArray.message[i] = response["e"];
+        sh.getRange("hMessage").offset(i + 1, 0).setValue(response.e)
       }
     };
+  };
     const endTime = Date.now();
     const totTime =  Math.round(((endTime - startTime) * 0.001));
     setStatus("Done creating " + createdIssues + "/" + dataArray.numIssues + " issues in " + totTime +"sec.");
@@ -79,8 +96,8 @@ function main() {
  */
 function readSheetData (NamedDataRange = "rSheetData"){
   
-  const sheet = SpreadsheetApp.getActiveSheet();
-  var sData = sheet.getRange(NamedDataRange).getValues();
+  const sh = SpreadsheetApp.getActiveSheet();
+  var sData = sh.getRange(NamedDataRange).getValues();
 
   // Extract headers from https://stackoverflow.com/questions/62186607/how-to-convert-table-data-to-an-object-and-have-headers-as-keys
   var headers = sData[0]; //header row
@@ -98,16 +115,16 @@ function readSheetData (NamedDataRange = "rSheetData"){
   })
   
   //set defaults 
-  dataMap["defaultPriority"] = sheet.getRange("cfgDefaultIssuePriority").getValue()
-  dataMap["defaultType"] = sheet.getRange("cfgDefaultIssueType").getValue();
-  dataMap["urlSubDomain"] = sheet.getRange("cfgJiraSubdomain").getValue();
+  dataMap["defaultPriority"] = sh.getRange("cfgDefaultIssuePriority").getValue()
+  dataMap["defaultType"] = sh.getRange("cfgDefaultIssueType").getValue();
+  dataMap["urlSubDomain"] = sh.getRange("cfgJiraSubdomain").getValue();
   dataMap["urlHTTPIssue"] = dataMap.urlSubDomain + ".atlassian.net/browse/";
   dataMap["urlIssue"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/2/issue/";
   dataMap["urlProject"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/2/project/search";
   dataMap["urlUsers"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/3/user/search?query=*&maxResults=2500";
-  dataMap["numDataRows"] = sheet.getRange("numRows").getValue();
-  dataMap["numIssues"] = sheet.getRange("numIssues").getValue();
-  //dataMap['cfParent'] = sheet.getRange("cfParent").getValue();
+  dataMap["numDataRows"] = sh.getRange("numRows").getValue();
+  dataMap["numIssues"] = sh.getRange("numIssues").getValue();
+  dataMap["numLinks"] = sh.getRange("numLinks").getValue();
 
   return dataMap;
 }
@@ -121,8 +138,8 @@ function readSheetData (NamedDataRange = "rSheetData"){
  * @customfunction
  */
 function setStatus(message="", isError=false){
-  const sheet = SpreadsheetApp.getActiveSheet();
-  let status = sheet.getRange("status");
+  const sh = SpreadsheetApp.getActiveSheet();
+  const status = sh.getRange("status");
   if (isError == true){
     status.setValue(message)
     .setBackground('#f4cccc'); //red
@@ -133,6 +150,7 @@ function setStatus(message="", isError=false){
     status.setValue(message)
     .setBackground('#fff2cc');
   }
+  Logger.log(message); //add message to the logger as welk
 }
 
 /**
@@ -142,11 +160,17 @@ function setStatus(message="", isError=false){
  * @customfunction
  */
 function clearData(userClear=false){
-  const sheet = SpreadsheetApp.getActiveSheet();
+  const sh = SpreadsheetApp.getActiveSheet();
   if (userClear){
-    sheet.getRange("UserData").clearContent();
+    sh.getRange("UserData").clearContent();
   }
-  sheet.getRange("colMessage").clearContent();
+  sh.getRange("colMessage").clearContent();
+
+  sh.getRange('rSkip').setDataValidation(SpreadsheetApp.newDataValidation()
+  .setAllowInvalid(true)
+  .requireCheckbox()
+  .build());
+
   setStatus();
 }
 
@@ -164,10 +188,10 @@ function clearData(userClear=false){
   }
 
 function getUserAndProjects(){
-  const sheet = SpreadsheetApp.getActiveSheet();
+  const sh = SpreadsheetApp.getActiveSheet();
   
-  sheet.getRange("Projects").clearContent();
-  sheet.getRange("Users").clearContent();
+  sh.getRange("Projects").clearContent();
+  sh.getRange("Users").clearContent();
   
   setStatus('Reading data...');
   
@@ -187,15 +211,15 @@ function getUserAndProjects(){
   }
   setStatus("Downloading Users...")
   let users = getUsers(dataArray.urlUsers,creds)
-  sheet.getRange("hDisplayName").offset(1,0,users.name.length,1).setValues(users.name);
-  sheet.getRange("hUserID").offset(1,0,users.id.length,1).setValues(users.id);
+  sh.getRange("hDisplayName").offset(1,0,users.name.length,1).setValues(users.name);
+  sh.getRange("hUserID").offset(1,0,users.id.length,1).setValues(users.id);
 
   setStatus("Downloading Projects...")
   let projects = getProjects(dataArray.urlProject,creds);
 
   //write projects to the sheet
-  sheet.getRange("hProjectKey").offset(1,0,projects.key.length,1).setValues(projects.key);
-  sheet.getRange("hProjectName").offset(1,0,projects.key.length,1).setValues(projects.name);
+  sh.getRange("hProjectKey").offset(1,0,projects.key.length,1).setValues(projects.key);
+  sh.getRange("hProjectName").offset(1,0,projects.key.length,1).setValues(projects.name);
    setStatus((projects.key.length +" Projects downloaded!"))
 }  
 
