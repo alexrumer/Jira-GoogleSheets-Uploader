@@ -1,7 +1,9 @@
 # Jira-GoogleSheets-Uploader
 
 ## Introduction
-This is an early version of the Google Sheets Jira Uploader tool. It allows a user to create multiple issues in different Jira project in a single operation. 
+This is an early version of the Google Sheets Jira Uploader tool. It allows a user to create bulk issues in different Jira project in a single operation. 
+![image](https://github.com/user-attachments/assets/869513e1-0b31-459a-b126-3d430b4fe33a)
+
 
 Access it here [Google Sheet](https://docs.google.com/spreadsheets/d/1lKrBVyCNkSq-YC1n8Sjv-wwdaJ33XzCsVUP8POrYsq8/edit?gid=1564783105#gid=1564783105).
 
