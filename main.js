@@ -1,23 +1,6 @@
-function onOpen(){
-  createMenu()
-};
-function createMenu() {
-  const sheet = SpreadsheetApp.getActiveSheet();
-    let showhideColumnsMenuItem = "Show Advanced Columns";
-    if (sheet.getRange("cfgShowAdvanced").getValue()){
-        showhideColumnsMenuItem = "Hide Advanced Columns";
-    }
-   SpreadsheetApp.getUi().createMenu("⚙️ Jira Uploader")
-    .addItem("Send Data to Jira", "CreateIssues")
-    .addSeparator()
-    .addItem("Reset Sheet (Clear Issues)", "clearSheetButton")
-    .addSeparator()
-    .addItem("Sync Projects and Users", "getUserAndProjects")
-    .addItem(showhideColumnsMenuItem, "hideAdvColumns")
-    .addToUi();
-}
 
-function CreateIssues() {
+
+function main() {
   const sheet = SpreadsheetApp.getActiveSheet();
   
   Logger.log("Version: " + sheet.getRange("version").getValue());
@@ -25,11 +8,17 @@ function CreateIssues() {
   setStatus('Reading data...');
   var dataArray = readSheetData("rSheetData");
   
+  if (dataArray.urlSubDomain==""){
+    setStatus("Please enter a Jira subdomain on the Config tab",true);
+    return false;
+  
+  }
+
   setStatus('Data read');
   let creds = getLogin();
   if (creds == false){
     setStatus('Login cancelled',true);
-    return false
+    return false;
   }
 
   //check if login is correct
@@ -76,7 +65,7 @@ function CreateIssues() {
         dataArray["message"][i] = response["e"];
         sheet.getRange("hMessage").offset(i + 1, 0).setValue(response.e)
       }
-    }
+    };
     const endTime = Date.now();
     const totTime =  Math.round(((endTime - startTime) * 0.001));
     setStatus("Done creating " + createdIssues + "/" + dataArray.numIssues + " issues in " + totTime +"sec.");
@@ -170,6 +159,7 @@ function clearData(userClear=false){
   );
   if (response == ui.Button.YES) {
     clearData(true);
+    showAdvColumns(true);
   }
   }
 
@@ -210,10 +200,11 @@ function getUserAndProjects(){
 }  
 
 
-function hideAdvColumns(){
+function showAdvColumns(showOverride = false){
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(); // Get the active sheet
   const colRange = sheet.getRange("cfgShowAdvanced");
-  const showCols = colRange.getValue();
+  let showCols = colRange.getValue();
+  if (showOverride){showCols=true}
   const targetRow = sheet.getRange("rHeaders").getRow()-1; // get the row of the hide marker
   const dataRange = sheet.getRange(targetRow, 1, 1, sheet.getLastColumn()); // Get the target row range
   const rowValues = dataRange.getValues()[0]; // Get the values in the target row
@@ -222,14 +213,14 @@ function hideAdvColumns(){
   
   if (showCols){
     for (let col = 0; col < rowValues.length; col++) {
-      if (rowValues[col].toLowerCase() === "x") {
+      if (rowValues[col].toLowerCase() === "hide") {
         sheet.hideColumns(col + 1); // Column index is 1-based
       };
     colRange.setValue(false); // 
     };
   }else{
     for (let col = 0; col < rowValues.length; col++) {
-      if (rowValues[col].toLowerCase() === "x") {
+      if (rowValues[col].toLowerCase() === "hide") {
         sheet.showColumns(col + 1); // Column index is 1-based
       };
     };
@@ -238,5 +229,25 @@ function hideAdvColumns(){
   createMenu(); // update menu item
 }
 
+//load menu
+function onOpen(){
+  createMenu()
+};
 
+//define menu
+function createMenu() {
+  const sheet = SpreadsheetApp.getActiveSheet();
+    let showhideColumnsMenuItem = "Show Advanced Columns";
+    if (sheet.getRange("cfgShowAdvanced").getValue()){
+        showhideColumnsMenuItem = "Hide Advanced Columns";
+    }
+   SpreadsheetApp.getUi().createMenu("⚙️ Jira Uploader")
+    .addItem("Send Data to Jira", "main")
+    .addSeparator()
+    .addItem("Reset Sheet (Clear Issues)", "clearSheetButton")
+    .addSeparator()
+    .addItem("Sync Projects and Users", "getUserAndProjects")
+    .addItem(showhideColumnsMenuItem, "showAdvColumns")
+    .addToUi();
+}
 

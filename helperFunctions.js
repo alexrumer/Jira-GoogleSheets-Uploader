@@ -30,13 +30,3 @@ function setCellURLKey(range, jiraKey, baseurl) {
               .toLowerCase();
       });
   }
-  // from https://webapps.stackexchange.com/questions/93305/how-to-find-url-of-the-current-sheet
-  function getSheetUrl(sht) {
-    var ss = SpreadsheetApp.getActive();
-  
-    var SHT = sht ? sht : ss.getActiveSheet();
-  
-    var url = (ss.getUrl() + '#gid=' + SHT.getSheetId());
-  
-    return url;
-  }

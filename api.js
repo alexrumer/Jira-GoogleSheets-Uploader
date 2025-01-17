@@ -73,9 +73,9 @@ function createIssue (credentials, dataArray, issueIndex){
  */
 function updateIssue (credentials, dataArray, issueIndex){
   const sheet = SpreadsheetApp.getActiveSheet();
-  let url = dataArray.urlIssue + dataArray["key"][issueIndex] + "?returnIssue=True";
-  let description = dataArray.description[issueIndex];
-  let summary = dataArray.summary[issueIndex];
+  const url = dataArray.urlIssue + dataArray["key"][issueIndex] + "?returnIssue=True";
+  const description = dataArray.description[issueIndex];
+  const summary = dataArray.summary[issueIndex];
   let priority = dataArray.priority[issueIndex];
   if (priority ==""){
     priority = sheet.getRange("defaultPriority").getValue();
@@ -85,8 +85,14 @@ function updateIssue (credentials, dataArray, issueIndex){
   if (parentKey == ""){parentKey = null};
   let assginee = dataArray.user[issueIndex];
   if (assginee == ""){assginee = null};
+
+  //issue links
+  let linkName = dataArray.issuelinkname[issueIndex];
+  let linkIn = dataArray.issuelinkin[issueIndex];
+  let linkOut = dataArray.issuelinkout[issueIndex];
+  let outwardIssue =dataArray.issuelinkkey[issueIndex];
   
-  var data = {}
+  var data = {};
 
   data = {
     "fields": {
@@ -102,14 +108,36 @@ function updateIssue (credentials, dataArray, issueIndex){
         "key": parentKey
       }
     }
-  };
+  }
+    var issuelinkdata = {};
+    issuelinkdata = {
+      "update":{
+        "issuelinks":[
+          {
+            "add":{
+              "type":{
+                "name": linkName,
+                  "inward":linkIn,
+                  "outward":linkOut,
+              },
+              "outwardIssue":{
+                "key":outwardIssue
+              }
+            }
+          }
+        ]
+      }
+    };
 
-  
+  if (outwardIssue != ""){
+    data = Object.assign({}, data, issuelinkdata);
+  }
 
   var payload = JSON.stringify(data);
 
   return sendAPIData(url, credentials, "PUT", payload);
 }
+
 
 /**
  * Sends payload data to the Jira API.
