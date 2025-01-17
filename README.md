@@ -26,7 +26,7 @@ In order to use this tool, you will need to get an [API token from Atlassian](ht
 1. Add all of your required issue data. Project Key and Summary are required. Issue Type and Priority default values will be used if none are provided. For IssueLink, select from the dropdown the issue ID (see the left most column) for the issue you want to link to. For example, if the default issue link type is Blocks, and the first issue selected in the IssueLink field, when created that issue will be shown as "Blocked by" the issue on line 1. 
  ![image](https://github.com/user-attachments/assets/40f3a9eb-af41-476c-bb92-eadb449e085a)
 2. Once the data is filled out, click on **Jira Uploader -> Send Data to Jira*.
-3. If using the sheet for the first time, you will need to review and approve the authorization.  
+3. If using the sheet for the first time, you will need to review and approve the authorization. Click *OK* on the pop-up, and then click on *Advanced* and finally on Go to *Jira Uploader (unsafe)*. Run the commmand again after approving the sheet.
 ![image](https://github.com/alexrumer/Jira-GoogleSheets-Uploader/assets/20408958/2f7489d5-50ee-40e7-94c8-50c48e7e957a)
 4. Provide your Atlassian account name. If the field "Ask for Username" is unchecked, then the username will be only be asked once per browser user. 
 5. Provide your API token generated above.
