@@ -1,11 +1,30 @@
-function main() {
+function onOpen(){
+  createMenu()
+};
+function createMenu() {
+  const sheet = SpreadsheetApp.getActiveSheet();
+    let showhideColumnsMenuItem = "Show Advanced Columns";
+    if (sheet.getRange("cfgShowAdvanced").getValue()){
+        showhideColumnsMenuItem = "Hide Advanced Columns";
+    }
+   SpreadsheetApp.getUi().createMenu("⚙️ Jira Uploader")
+    .addItem("Send Data to Jira", "CreateIssues")
+    .addSeparator()
+    .addItem("Reset Sheet (Clear Issues)", "clearSheetButton")
+    .addSeparator()
+    .addItem("Sync Projects and Users", "getUserAndProjects")
+    .addItem(showhideColumnsMenuItem, "hideAdvColumns")
+    .addToUi();
+}
+
+function CreateIssues() {
   const sheet = SpreadsheetApp.getActiveSheet();
   
   Logger.log("Version: " + sheet.getRange("version").getValue());
   //read sheet data
   setStatus('Reading data...');
   var dataArray = readSheetData("rSheetData");
-
+  
   setStatus('Data read');
   let creds = getLogin();
   if (creds == false){
@@ -18,7 +37,9 @@ function main() {
     setStatus("Credentials are invalid!",true);
     return false;
   }
-
+  //login is ok, proceed with clearing old data and creating issues
+  const startTime = Date.now();
+  let createdIssues=0;
   //clear status data
   clearData(false);
 
@@ -30,12 +51,13 @@ function main() {
       response = {}
       response = createIssue(creds, dataArray, i)
       if (response.code == 201){
-         setStatus("Created issue " + (i + 1) + " of " + dataArray.numDataRows)
+         setStatus("Created issue " + (createdIssues + 1) + " of " + dataArray.numIssues)
         Logger.log(response.key);
         dataArray["key"][i] = response.key;
-        sheet.getRange("hMessage").offset(i + 1, 0).setValue("Created!");
+        sheet.getRange("hMessage").offset(i + 1, 0).setValue("201: Created!");
         sheet.getRange("hSkip").offset(i + 1, 0).setValue("TRUE");
         setCellURLKey(sheet.getRange("hKey").offset(i +1, 0), response.data.key, dataArray.urlHTTPIssue)
+        createdIssues++;
       }else{
         Logger.log(response["e"]);
         dataArray.message[i] = response.e;
@@ -46,17 +68,18 @@ function main() {
       response = {}
       response = updateIssue(creds, dataArray, i)
       if (response.code == 200){
-         setStatus("Updated issue " + (i + 1) + " of " + dataArray.numDataRows)
-         sheet.getRange("hMessage").offset(i +1, 0).setValue("Updated!");
+         setStatus("Updated issue " + (createdIssues + 1) + " of " + dataArray.numIssues)
+         sheet.getRange("hMessage").offset(i +1, 0).setValue("200: Updated!");
+         createdIssues++;
       }else{
         Logger.log(response["e"]);
         dataArray["message"][i] = response["e"];
         sheet.getRange("hMessage").offset(i + 1, 0).setValue(response.e)
       }
     }
-
-    setStatus("Done creating issues");
-
+    const endTime = Date.now();
+    const totTime =  Math.round(((endTime - startTime) * 0.001));
+    setStatus("Done creating " + createdIssues + "/" + dataArray.numIssues + " issues in " + totTime +"sec.");
 }
 
 /**
@@ -86,15 +109,16 @@ function readSheetData (NamedDataRange = "rSheetData"){
   })
   
   //set defaults 
-  dataMap["defaultPriority"] = sheet.getRange("defaultPriority").getValue()
-  dataMap["defaultType"] = sheet.getRange("defaultType").getValue();
-  dataMap["urlSubDomain"] = sheet.getRange("jirasubdomain").getValue();
+  dataMap["defaultPriority"] = sheet.getRange("cfgDefaultIssuePriority").getValue()
+  dataMap["defaultType"] = sheet.getRange("cfgDefaultIssueType").getValue();
+  dataMap["urlSubDomain"] = sheet.getRange("cfgJiraSubdomain").getValue();
   dataMap["urlHTTPIssue"] = dataMap.urlSubDomain + ".atlassian.net/browse/";
   dataMap["urlIssue"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/2/issue/";
   dataMap["urlProject"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/2/project/search";
   dataMap["urlUsers"] = "https://" + dataMap.urlSubDomain + ".atlassian.net/rest/api/3/user/search?query=*&maxResults=2500";
   dataMap["numDataRows"] = sheet.getRange("numRows").getValue();
-  dataMap['cfParent'] = sheet.getRange("cfParent").getValue();
+  dataMap["numIssues"] = sheet.getRange("numIssues").getValue();
+  //dataMap['cfParent'] = sheet.getRange("cfParent").getValue();
 
   return dataMap;
 }
@@ -138,9 +162,16 @@ function clearData(userClear=false){
 }
 
 //function called by the user on the sheet via button to clear sheet
-function clearSheetButton(){
-  clearData(true);
-}
+  function clearSheetButton(){
+    var ui = SpreadsheetApp.getUi();
+    var response = ui.alert(
+      'Are you sure you clear the sheet?',
+      ui.ButtonSet.YES_NO
+  );
+  if (response == ui.Button.YES) {
+    clearData(true);
+  }
+  }
 
 function getUserAndProjects(){
   const sheet = SpreadsheetApp.getActiveSheet();
@@ -177,3 +208,35 @@ function getUserAndProjects(){
   sheet.getRange("hProjectName").offset(1,0,projects.key.length,1).setValues(projects.name);
    setStatus((projects.key.length +" Projects downloaded!"))
 }  
+
+
+function hideAdvColumns(){
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet(); // Get the active sheet
+  const colRange = sheet.getRange("cfgShowAdvanced");
+  const showCols = colRange.getValue();
+  const targetRow = sheet.getRange("rHeaders").getRow()-1; // get the row of the hide marker
+  const dataRange = sheet.getRange(targetRow, 1, 1, sheet.getLastColumn()); // Get the target row range
+  const rowValues = dataRange.getValues()[0]; // Get the values in the target row
+  
+  // Loop through the columns and hide those with "hide" in the target row
+  
+  if (showCols){
+    for (let col = 0; col < rowValues.length; col++) {
+      if (rowValues[col].toLowerCase() === "x") {
+        sheet.hideColumns(col + 1); // Column index is 1-based
+      };
+    colRange.setValue(false); // 
+    };
+  }else{
+    for (let col = 0; col < rowValues.length; col++) {
+      if (rowValues[col].toLowerCase() === "x") {
+        sheet.showColumns(col + 1); // Column index is 1-based
+      };
+    };
+    colRange.setValue(true);
+  }
+  createMenu(); // update menu item
+}
+
+
+

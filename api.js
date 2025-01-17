@@ -15,17 +15,17 @@ function createIssue (credentials, dataArray, issueIndex){
   //initalize fields
   let description = dataArray.description[issueIndex];
   let summary = dataArray.summary[issueIndex];
-  
   let issueType = dataArray.type[issueIndex];
+ 
   if (issueType ==""){
-    issueType = dataArray.defaultType;
+    issueType = dataArray.defaultType; //set default issue type if one is not provided
     sheet.getRange("hType").offset(issueIndex + 1,0).setValue(issueType);
   }
   issueType = toTitle(issueType); //convert to Proper case due to API case sensitivty
  
   let priority = dataArray.priority[issueIndex];
   if (priority ==""){
-    priority = dataArray.defaultPriority;
+    priority = dataArray.defaultPriority; //set default issue priority if one is not provided
     sheet.getRange("hPriority").offset(issueIndex + 1,0).setValue(priority);
   }
   priority = toTitle(priority);
@@ -232,7 +232,7 @@ function getLogin() {
     }
 
   if(sheet.getRange("askforUser").getValue() || prop.getProperty("username") == ""){
-   //user name is not yet saved or ask every time is selected
+   //user name is not yet saved or 'ask every time' is selected
     var uname = ui.prompt("Please enter Jira Username",ui.ButtonSet.OK_CANCEL);
     if (uname.getResponseText().length > 0) {
       Logger.log("User provided username");
