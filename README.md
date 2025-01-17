@@ -19,8 +19,8 @@ In order to use this tool, you will need to get an [API token from Atlassian](ht
  4. Set up your available issue type, priority levels, and issue link types.
  5. Use the dropdowns to select the default values for issues, priority, and issue types for when the user does not provide them.
    ![image](https://github.com/user-attachments/assets/bda875b3-d009-48ba-a2da-957e24e11678)
- 6. On the main sheet, select *Jira Uploader -> Sync Users and Projects* to download all of the active users (needed to assignment users to issues) as well as the Jira project keys for creating tickets in correct projects. Only the projects you have access to will be downloaded. THese will be saved to your copy of the sheet in the Projects and Users tab.
-  ![image](https://github.com/user-attachments/assets/359e573e-d054-4f32-a3e3-45dfdf0799ce)
+ 6. On the main sheet, select *Jira Uploader -> Sync Users and Projects* to download all of the active users (needed to assignment users to issues) as well as the Jira project keys for creating tickets in correct projects. Only the projects you have access to will be downloaded. These will be saved to your copy of the sheet in the *Projects and Users* tab.  
+    ![image](https://github.com/user-attachments/assets/359e573e-d054-4f32-a3e3-45dfdf0799ce)
    
 ### Usage
 1. Add all of your required issue data. Project Key and Summary are required. Issue Type and Priority default values will be used if none are provided. For IssueLink, select from the dropdown the issue ID (see the left most column) for the issue you want to link to. For example, if the default issue link type is Blocks, and the first issue selected in the IssueLink field, when created that issue will be shown as "Blocked by" the issue on line 1. 
