@@ -265,19 +265,33 @@ function getLogin() {
   const sh = SpreadsheetApp.getActiveSheet(); 
   let prop =  PropertiesService.getUserProperties();
   let username = "";
+  let token = ""; 
+  let saveLogin = sh.getRange("askforUser").getValue();
 
-  //init property
+  //init properties
   if (prop.getProperty("username") == null ){
     prop.setProperty("username","")
-    }
+  }
 
-  if(sh.getRange("askforUser").getValue() || prop.getProperty("username") == ""){
-   //user name is not yet saved or 'ask every time' is selected
+  if (prop.getProperty("token") == null ){
+    prop.setProperty("token","")
+  }
+
+  //clear saved user data if saved login is disabled
+  if(!saveLogin){
+    prop.setProperty("username", "");
+    prop.setProperty("token", "");
+  } 
+
+  if(prop.getProperty("username") == ""){
+   //user name is not yet saved, invalid,  or save login option is disabled
     var uname = ui.prompt("Please enter Jira Username",ui.ButtonSet.OK_CANCEL);
     if (uname.getResponseText().length > 0) {
       Logger.log("User provided username");
       username = uname.getResponseText();
-      prop.setProperty("username",username);
+      if (saveLogin){
+        prop.setProperty("username", username);
+      };
     } else {
       Logger.log("ERROR: User aborted username"); 
       return false;
@@ -286,17 +300,24 @@ function getLogin() {
     username = prop.getProperty("username");
   }
 
-  //get API key
-  var apitoken= ui.prompt("Please enter Jira API key",ui.ButtonSet.OK_CANCEL);
-  
-  if (apitoken.getResponseText().length > 0) {
-    Logger.log("User provided API Token");
-  } else {
-    Logger.log("ERROR: User didn't provide key"); 
-    return false;
+  if(prop.getProperty("token") == ""){
+   //token is not yet saved, invalid, or save login option is disabled
+    var apitoken = ui.prompt("Please enter Jira API key",ui.ButtonSet.OK_CANCEL);
+    if (apitoken.getResponseText().length > 0) {
+      Logger.log("User provided API Token");
+      token = apitoken.getResponseText();
+      if (saveLogin){
+        prop.setProperty("token", token);
+      };
+    } else {
+      Logger.log("ERROR: User didn't provide key"); 
+      return false;
+    }  
+  }else{
+    token = prop.getProperty("token");
   }
 
-  let credentials = username + ':' + apitoken.getResponseText();
+  let credentials = username + ':' + token;
   return Utilities.base64Encode(credentials);
 }
 
@@ -318,6 +339,7 @@ function isValidLogin(projectURL, credentials){
     return true;
   }else {
     prop.setProperty("username", "");
+    prop.setProperty("token", "");
     return false;
   }
 
