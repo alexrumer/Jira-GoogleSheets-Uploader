@@ -74,7 +74,7 @@ function main() {
       response = addIssueLinks(creds, dataArray, i)
       if (response.code == 200){
          createdLinks++;
-         setStatus("Added issue link to" + (createdLinks) + " of " + dataArray.numLinks + "...")
+         setStatus("Added issue link to " + (createdLinks) + " of " + dataArray.numLinks + "...")
          sh.getRange("hMessage").offset(i +1, 0).setValue("200: Updated link!");
       }else{
         Logger.log(response["e"]);

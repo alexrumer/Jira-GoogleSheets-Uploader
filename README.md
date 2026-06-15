@@ -1,9 +1,8 @@
 # Jira-GoogleSheets-Uploader
 
 ## Introduction
-This is an early version of the Google Sheets Jira Uploader tool. It allows a user to create bulk issues in different Jira project in a single operation. 
-![Automation](https://github.com/user-attachments/assets/3e06db05-b1a7-4371-b566-a2696a5f0c2a)
-
+This is the Google Sheets Jira Uploader tool. It allows a user to create bulk issues in different Jira project in a single operation.  
+  <img height="350" alt="demo gif" src="https://github.com/user-attachments/assets/9d2c9d10-4335-442b-8f0d-19916a541be8" />
 
 Access it here [Google Sheet](https://docs.google.com/spreadsheets/d/1MNpOlAPB5ZpoOhahrRmF7zc7uh9vcKTDTO_s7sIjZjw/edit?gid=1564783105#gid=1564783105).
 
@@ -15,26 +14,29 @@ In order to use this tool, you will need to get an [API token from Atlassian](ht
  1. Save a copy of this sheet. 
  2. Navigate to the Config tab.
  3. Enter your Jira cloud subdomain (from the URL https://SUBDOMAIN.atlassian.net/)
-    ![image](https://github.com/user-attachments/assets/80b8a629-c047-473f-a477-057d5e7898f5)
- 4. Set up your available issue type, priority levels, and issue link types.
- 5. Use the dropdowns to select the default values for issues, priority, and issue types for when the user does not provide them.
-   ![image](https://github.com/user-attachments/assets/bda875b3-d009-48ba-a2da-957e24e11678)
- 6. On the main sheet, select *Jira Uploader -> Sync Users and Projects* to download all of the active users (needed to assign users to issues) as well as the Jira project keys for creating tickets in the correct projects. Only the projects you have access to will be downloaded. These will be saved to your copy of the sheet in the *Projects and Users* tab.  
-    ![image](https://github.com/user-attachments/assets/359e573e-d054-4f32-a3e3-45dfdf0799ce)
+    <img height="200" alt="imgConfigMain" src="https://github.com/user-attachments/assets/0a0f2962-96fe-4322-a997-4c5330d1f834" />
+ 5. Edit up your available issue type, priority levels, and issue link types, as needed. Links to your Jira instance's config pages are on the bottom right.  
+    <img height="100" alt="imgJiraLinks" src="https://github.com/user-attachments/assets/731f4957-b76a-4d7a-a955-d894398bb931" />
+ 7. Use the dropdowns to select the default values for issues, priority, and issue types for when the user does not provide them.
+    <img height="200" alt="imgConfigIssues" src="https://github.com/user-attachments/assets/bda875b3-d009-48ba-a2da-957e24e11678" />
+ 8. On the main sheet, select *Jira Uploader -> Sync Users and Projects* to download all of the active users as well as the Jira project keys for creating tickets in the correct projects. Only the projects you have access to will be downloaded. These will be saved to your copy of the sheet in the *Projects and Users* tab. Active users are downloaded to allow in sheet issue assignments.  
+    <img height="200" alt="imgConfigIssues" src="https://github.com/user-attachments/assets/359e573e-d054-4f32-a3e3-45dfdf0799ce" />
    
 ### Usage
-1. Add all of your required issue data. Project Key and Summary are required. Issue Type and Priority default values will be used if none are provided. For IssueLink, select from the dropdown the issue ID (see the leftmost column) for the issue you want to link to. For example, if the default issue link type is Blocks, and the first issue selected in the IssueLink field, when created that issue will be shown as "Blocked by" the issue on line 1. 
- ![image](https://github.com/user-attachments/assets/40f3a9eb-af41-476c-bb92-eadb449e085a)
-2. Once the data is filled out, click on *Jira Uploader -> Send Data to Jira*.
-3. If using the sheet for the first time, you will need to review and approve the authorization. Click *OK* on the pop-up, and then click on *Advanced* and finally on Go to *Jira Uploader (unsafe)*. Run the command again after approving the sheet.  
-![image](https://github.com/alexrumer/Jira-GoogleSheets-Uploader/assets/20408958/2f7489d5-50ee-40e7-94c8-50c48e7e957a)
-4. Provide your Atlassian account name. If the field "Ask for Username" is unchecked, then the username will only be asked once per browser user. 
-5. Provide your API token generated above.
-6. The issues will be created one by one and the results shown.
-![image](https://github.com/user-attachments/assets/956b96ca-ee9f-4743-9f42-00791a28dd42)
-7. You can resubmit the data again. Issues checked as *Skip* will be updated (Summary, Description, Assignee, Parent, and Priority only), while unchecked issues will be recreated with new issue IDs or if they were added since the last execution, created for the first time.
-8. Note: some fields are hidden by default to ease of use. To unhide these fields, select *Jira Uploader -> Show Advanced Fields*.
-9. Once done, select *Jira Uploader -> Reset Sheet (Clear Issues)* to reset the sheet to the default state for next use.
+1. Add all of your required issue data. Project Key and Summary are required. Issue Type and Priority default values will be used if none are provided. For IssueLink, select from the dropdown the issue ID (see the leftmost column) for the issue you want to link to. For example, if the default issue link type is Blocks, and the first issue selected in the IssueLink field, when created that issue will be shown as "Blocked by" the issue on line 1.
+   <img height="200" alt="imgIssues" src="https://github.com/user-attachments/assets/40f3a9eb-af41-476c-bb92-eadb449e085a" />
+3. Once the data is filled out, click on *Jira Uploader -> Send Data to Jira*.   
+   <img height="200" alt="imgSendIssues" src="https://github.com/user-attachments/assets/2a366b31-66c7-49d4-837e-4ac9256abe5e" />
+5. If using the sheet for the first time, you will need to review and approve the authorization. Click *OK* on the pop-up, and then click on *Advanced* and finally on Go to *Jira Uploader (unsafe)*. Run the command again after approving the sheet.
+    <img height="150" alt="imgAuth" src="https://github.com/alexrumer/Jira-GoogleSheets-Uploader/assets/20408958/2f7489d5-50ee-40e7-94c8-50c48e7e957a" />
+6. Provide your Atlassian account name if prompted. 
+7. Provide your API token generated above if prompted.  
+ *NOTE: If Save Login on the config tab is checked, the username and API token will be saved in the Google doc's property service for the scope of this document and only you.* 
+8. The issues will be created one by one and the results shown.
+   <img height="200" alt="imgissuesSubmitted" src="https://github.com/user-attachments/assets/956b96ca-ee9f-4743-9f42-00791a28dd42" />
+9. You can resubmit the data again. Issues checked as *Skip* will be updated (Summary, Description, Assignee, Parent, and Priority only), while unchecked issues will be recreated with new issue IDs or if they were added since the last execution, created for the first time. 
+ NOTE: some fields are hidden by default to ease of use. To unhide these fields, select *Jira Uploader -> Show Advanced Fields*. 
+10. To clear the sheet for another use, select *Jira Uploader -> Reset Sheet (Clear Issues)* to reset the sheet and clear all fields. 
    
 ## Supported fields
 | Field Name  | Description | Required | Notes | Ticket Updated when Rerunning Script | Hidden |
@@ -49,8 +51,7 @@ In order to use this tool, you will need to get an [API token from Atlassian](ht
 | IssueLinkType | The link type (e.g. "Blocks") used to link the issue | NO, The default link type will be used if a linked issue is selected, but the link type is unspecified. | New links added only, but old ones are not deleted. | YES, only if different link type. | YES |
 | IssueLink | Outward Link to issue | NO | YES | YES, only if different link type. | NO |
 
-## Troubleshooting
+## Troubleshooting and Notes
 ## General troubleshooting
 1. Sometimes issues will fail to be created if some non-default fields are required for issue creation (e.g. reproduction steps). Check the error message provided. You will need to modify the source code to add those.
-
-
+2. To change your API saved token, first uncheck the "Save Login" checkbox. Then submit issues once and cancel at the login prompt to clear saved credentials. Then recheck the check box and submit issues with new credentials to save them. 
