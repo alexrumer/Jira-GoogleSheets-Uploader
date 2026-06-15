@@ -1,9 +1,8 @@
 # Jira-GoogleSheets-Uploader
 
 ## Introduction
-This is an early version of the Google Sheets Jira Uploader tool. It allows a user to create bulk issues in different Jira project in a single operation.  
+This is the Google Sheets Jira Uploader tool. It allows a user to create bulk issues in different Jira project in a single operation.  
   <img height="350" alt="demo gif" src="https://github.com/user-attachments/assets/9d2c9d10-4335-442b-8f0d-19916a541be8" />
-
 
 Access it here [Google Sheet](https://docs.google.com/spreadsheets/d/1MNpOlAPB5ZpoOhahrRmF7zc7uh9vcKTDTO_s7sIjZjw/edit?gid=1564783105#gid=1564783105).
 
@@ -56,5 +55,3 @@ In order to use this tool, you will need to get an [API token from Atlassian](ht
 ## General troubleshooting
 1. Sometimes issues will fail to be created if some non-default fields are required for issue creation (e.g. reproduction steps). Check the error message provided. You will need to modify the source code to add those.
 2. To change your API saved token, first uncheck the "Save Login" checkbox. Then submit issues once and cancel at the login prompt to clear saved credentials. Then recheck the check box and submit issues with new credentials to save them. 
-
-
