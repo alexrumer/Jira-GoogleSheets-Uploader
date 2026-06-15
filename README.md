@@ -55,6 +55,6 @@ In order to use this tool, you will need to get an [API token from Atlassian](ht
 ## Troubleshooting and Notes
 ## General troubleshooting
 1. Sometimes issues will fail to be created if some non-default fields are required for issue creation (e.g. reproduction steps). Check the error message provided. You will need to modify the source code to add those.
-2. To change your API saved token, uncheck the "Save Login" checkbox, login once with the new token to clear the memory
+2. To change your API saved token, first uncheck the "Save Login" checkbox. Then submit issues once and cancel at the login prompt to clear saved credentials. Then recheck the check box and submit issues with new credentials to save them. 
 
 
