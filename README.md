@@ -27,7 +27,7 @@ In order to use this tool, you will need to get an [API token from Atlassian](ht
    <img height="200" alt="imgIssues" src="https://github.com/user-attachments/assets/40f3a9eb-af41-476c-bb92-eadb449e085a" />
 3. Once the data is filled out, click on *Jira Uploader -> Send Data to Jira*.   
    <img height="200" alt="imgSendIssues" src="https://github.com/user-attachments/assets/2a366b31-66c7-49d4-837e-4ac9256abe5e" />
-5. If using the sheet for the first time, you will need to review and approve the authorization. Click *OK* on the pop-up, and then click on *Advanced* and finally on Go to *Jira Uploader (unsafe)*. Run the command again after approving the sheet.
+5. If using the sheet for the first time, you will need to review and approve the authorization. Click *OK* on the pop-up, and then click on *Advanced* and finally on Go to *Jira Uploader (unsafe)*. Run the command again after approving the sheet.  
     <img height="150" alt="imgAuth" src="https://github.com/alexrumer/Jira-GoogleSheets-Uploader/assets/20408958/2f7489d5-50ee-40e7-94c8-50c48e7e957a" />
 6. Provide your Atlassian account name if prompted. 
 7. Provide your API token generated above if prompted.  
